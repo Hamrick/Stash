@@ -1,34 +1,113 @@
 <!doctype html>
-<html lang="en">
-<head>
+<html lang="en"><head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="A small public stash for images, videos, and simple webpages.">
-  <title>Stash</title>
+  <meta name="description" content="A public collection of images, videos, files, and simple webpages.">
+  <title>Stash — Ryan Hamrick</title>
   <style>
-    :root { color-scheme: dark; font-family: ui-sans-serif, system-ui, sans-serif; }
-    * { box-sizing: border-box; }
-    body { margin: 0; min-height: 100vh; display: grid; place-items: center; background: #0b0d10; color: #f5f7fa; }
-    main { width: min(900px, 92vw); padding: 4rem 0; }
-    h1 { margin: 0 0 .5rem; font-size: clamp(2.5rem, 8vw, 5rem); letter-spacing: -.06em; }
-    p { color: #aeb7c4; line-height: 1.6; }
-    .card { margin-top: 2rem; padding: 1rem; border: 1px solid #29313d; border-radius: 1rem; background: #12161c; }
-    video { display: block; width: 100%; max-height: 60vh; border-radius: .65rem; background: #090b0e; }
-    a { color: #8cc8ff; }
+    @font-face{font-family:ohno-fatface;src:url(https://use.typekit.net/af/59ca65/00000000000000007735c832/31/l?subset_id=2&fvd=n8&v=3) format("woff2");font-weight:800;font-style:normal;font-display:swap}
+    @font-face{font-family:covik-sans;src:url(https://use.typekit.net/af/701f12/00000000000000007735ce39/31/l?subset_id=2&fvd=n4&v=3) format("woff2");font-weight:400;font-style:normal;font-display:swap}
+    @font-face{font-family:covik-sans;src:url(https://use.typekit.net/af/180ea9/00000000000000007735ce3e/31/l?subset_id=2&fvd=n5&v=3) format("woff2");font-weight:500;font-style:normal;font-display:swap}
+
+    :root{color-scheme:dark;font-family:covik-sans,Arial,sans-serif;--bg:#131415;--text:#f8f6f4;--muted:#aaa8a5;--line:#373838;--surface:#1b1c1d;--content:1520px}
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{margin:0;min-height:100vh;background:var(--bg);color:var(--text);font-size:18px;font-weight:500;letter-spacing:-.02em}
+    button,input{font:inherit;letter-spacing:inherit}
+    a{color:inherit}
+    a:focus-visible,button:focus-visible,input:focus-visible{outline:2px solid var(--text);outline-offset:4px}
+    .shell{width:min(var(--content),calc(100% - 8vw));margin:0 auto;padding:40px 0 70px}
+    header{display:grid;grid-template-columns:minmax(0,1fr) minmax(260px,380px) auto;gap:26px;align-items:end;padding-bottom:34px;border-bottom:1px solid var(--line)}
+    h1,h2{font-family:ohno-fatface,Georgia,serif;font-weight:800;letter-spacing:0}
+    h1{margin:0;font-size:clamp(3.2rem,7vw,6.6rem);line-height:.9}
+    .intro{margin:17px 0 0;max-width:32ch;font-size:clamp(1.1rem,1.8vw,1.55rem);line-height:1.35}
+    .search{position:relative}
+    .search svg{position:absolute;left:0;top:50%;width:20px;height:20px;translate:0 -50%;pointer-events:none}
+    .search input{width:100%;height:48px;border:0;border-bottom:1px solid var(--line);border-radius:0;padding:0 8px 0 32px;background:transparent;color:var(--text)}
+    .search input::placeholder{color:var(--muted)}
+    .studio-link{padding-bottom:13px;text-decoration:none;white-space:nowrap}
+    .studio-link:hover{text-decoration:underline;text-underline-offset:4px}
+    nav{display:flex;gap:22px;overflow-x:auto;padding:22px 0 8px;scrollbar-width:none}
+    nav::-webkit-scrollbar{display:none}
+    .filter{border:0;border-bottom:2px solid transparent;padding:7px 0;background:transparent;color:var(--muted);cursor:pointer;white-space:nowrap}
+    .filter:hover,.filter[aria-pressed="true"]{color:var(--text);border-color:var(--text)}
+    #status{min-height:27px;margin:28px 0;color:var(--muted)}
+    #status:empty{display:none}
+    .section{margin-top:46px}
+    .section-heading{display:flex;justify-content:space-between;align-items:baseline;gap:20px;margin-bottom:18px}
+    h2{margin:0;font-size:clamp(2.1rem,4vw,4rem);line-height:1}
+    .count{color:var(--muted);font-size:.88rem}
+    .media-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:28px 18px}
+    .item{min-width:0;text-decoration:none}
+    .frame{position:relative;overflow:hidden;aspect-ratio:16/10;background:var(--surface);transition:opacity .2s ease}
+    .item:hover .frame{opacity:.76}
+    .frame img,.frame video{width:100%;height:100%;display:block;object-fit:cover;background:#0b0c0c}
+    .frame video{object-fit:contain}
+    .page-placeholder{height:100%;display:flex;flex-direction:column;justify-content:flex-end;padding:22px;border:1px solid var(--line);background:var(--surface)}
+    .page-placeholder strong{font-family:ohno-fatface,Georgia,serif;font-size:1.75rem;line-height:1}
+    .page-placeholder span{margin-top:10px;color:var(--muted);font-size:.85rem}
+    .name{display:block;margin-top:10px;overflow:hidden;font-size:1rem;text-overflow:ellipsis;white-space:nowrap}
+    .path{display:block;margin-top:3px;overflow:hidden;color:var(--muted);font-size:.75rem;font-weight:400;text-overflow:ellipsis;white-space:nowrap}
+    .file-list{border-top:1px solid var(--line)}
+    .file-row{display:grid;grid-template-columns:28px minmax(0,1fr) auto;gap:13px;align-items:center;min-height:52px;border-bottom:1px solid var(--line);text-decoration:none}
+    .file-row:hover{padding-left:8px;background:var(--surface)}
+    .file-icon,.file-size{color:var(--muted)}
+    .file-size{font-size:.8rem;font-weight:400}
+    .empty{padding:40px 0;color:var(--muted);border-top:1px solid var(--line)}
+    footer{margin-top:74px;padding-top:20px;border-top:1px solid var(--line);color:var(--muted);font-size:.8rem;font-weight:400}
+
+    @media(max-width:800px){.shell{width:calc(100% - 32px);padding-top:24px}header{grid-template-columns:1fr auto;align-items:start}.search{grid-column:1/-1;grid-row:2}.studio-link{grid-column:2;grid-row:1}.media-grid{grid-template-columns:repeat(auto-fill,minmax(190px,1fr))}}
+    @media(max-width:480px){header{grid-template-columns:1fr}.studio-link{grid-column:1;grid-row:3}.media-grid{grid-template-columns:1fr}}
+    @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.frame{transition:none}}
   </style>
 </head>
 <body>
-  <main>
-    <h1>Stash</h1>
-    <p>A public home for images, videos, and small static webpages.</p>
-    <section class="card">
-      <video autoplay loop muted playsinline controls>
-        <source src="videos/LimitlessHeroVidNoBG.webm" type="video/webm">
-        <source src="videos/LimitlessHeroVidNoBG.mov" type='video/mp4; codecs="hvc1"'>
-        <source src="images/LimitlessHeroVidFallback.png" type="image/png">
-      </video>
-      <p><a href="videos/LimitlessHeroVidNoBG.webm">Open the video directly</a></p>
-    </section>
-  </main>
-</body>
-</html>
+  <div class="shell">
+    <header>
+      <div><h1>Stash</h1><p class="intro">A living index of images, videos, webpages, and files.</p></div>
+      <label class="search">
+        <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg>
+        <input id="search" type="search" placeholder="Search files" autocomplete="off" aria-label="Search files">
+      </label>
+      <a class="studio-link" href="https://ryanhamrick.com">RyanHamrick.com ↗</a>
+    </header>
+
+    <nav aria-label="Filter content">
+      <button class="filter" type="button" data-filter="all" aria-pressed="true">All</button>
+      <button class="filter" type="button" data-filter="images" aria-pressed="false">Images</button>
+      <button class="filter" type="button" data-filter="videos" aria-pressed="false">Videos</button>
+      <button class="filter" type="button" data-filter="pages" aria-pressed="false">Webpages</button>
+      <button class="filter" type="button" data-filter="files" aria-pressed="false">Other files</button>
+    </nav>
+
+    <main><p id="status" role="status">Loading repository contents…</p><div id="content"></div></main>
+    <footer>Public files from <a href="https://github.com/Hamrick/Stash">Hamrick/Stash</a></footer>
+  </div>
+
+  <script>
+    const repo={owner:"Hamrick",name:"Stash",branch:"main"};
+    const categories=["images","videos","pages","files"];
+    const imageExt=new Set(["avif","gif","jpeg","jpg","png","svg","webp"]);
+    const videoExt=new Set(["m4v","mov","mp4","ogv","webm"]);
+    const ignored=new Set([".ds_store",".nojekyll","readme.md"]);
+    const state={files:[],filter:"all",query:""};
+    const content=document.querySelector("#content"),status=document.querySelector("#status"),search=document.querySelector("#search"),filters=document.querySelectorAll(".filter");
+    const ext=p=>p.includes(".")?p.split(".").pop().toLowerCase():"";
+    const base=p=>p.split("/").pop();
+    const href=p=>p.split("/").map(encodeURIComponent).join("/");
+    const title=p=>base(p).replace(/[-_]+/g," ").replace(/\.[^.]+$/,"");
+    const escapeHtml=v=>v.replace(/[&<>'"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;",'"':"&quot;"})[c]);
+    const bytes=n=>{if(!Number.isFinite(n))return"";const u=["B","KB","MB","GB"];let i=0;while(n>=1024&&i<u.length-1){n/=1024;i++}return`${n>=10||i===0?n.toFixed(0):n.toFixed(1)} ${u[i]}`};
+    function classify(p){const e=ext(p);if(imageExt.has(e))return"images";if(videoExt.has(e))return"videos";if(e==="html"&&p.toLowerCase()!=="index.html")return"pages";return"files"}
+    function include(f){const p=f.path.toLowerCase(),parts=p.split("/");return f.type==="blob"&&!ignored.has(base(p))&&p!=="index.html"&&!parts.some(x=>x.startsWith("."))}
+    function media(f,type){const url=href(f.path),name=escapeHtml(title(f.path)),path=escapeHtml(f.path);if(type==="pages"){const dest=f.path.toLowerCase().endsWith("/index.html")?href(f.path.slice(0,-10)):url;return`<a class="item" href="${dest}"><div class="frame"><div class="page-placeholder"><strong>${name}</strong><span>Open webpage ↗</span></div></div><span class="name">${name}</span><span class="path">${path}</span></a>`}const preview=type==="images"?`<img src="${url}" alt="${name}" loading="lazy">`:`<video src="${url}" controls preload="metadata" playsinline aria-label="${name}"></video>`;return`<a class="item" href="${url}"><div class="frame">${preview}</div><span class="name">${name}</span><span class="path">${path}</span></a>`}
+    function fileRow(f){return`<a class="file-row" href="${href(f.path)}"><span class="file-icon" aria-hidden="true">◇</span><span class="name">${escapeHtml(f.path)}</span><span class="file-size">${bytes(f.size)}</span></a>`}
+    function render(){const q=state.query.trim().toLowerCase(),shown=state.filter==="all"?categories:[state.filter],groups=Object.fromEntries(categories.map(c=>[c,[]]));state.files.forEach(f=>{const type=classify(f.path);if((!q||f.path.toLowerCase().includes(q))&&shown.includes(type))groups[type].push(f)});const labels={images:"Images",videos:"Videos",pages:"Webpages",files:"Other files"};const html=shown.map(type=>{const files=groups[type].sort((a,b)=>a.path.localeCompare(b.path));if(!files.length)return"";const items=type==="files"?`<div class="file-list">${files.map(fileRow).join("")}</div>`:`<div class="media-grid">${files.map(f=>media(f,type)).join("")}</div>`;return`<section class="section"><div class="section-heading"><h2>${labels[type]}</h2><span class="count">${files.length}</span></div>${items}</section>`}).join("");content.innerHTML=html||`<p class="empty">No files match your search.</p>`;status.textContent=""}
+    async function load(){const endpoint=`https://api.github.com/repos/${repo.owner}/${repo.name}/git/trees/${repo.branch}?recursive=1`;try{const response=await fetch(endpoint,{headers:{Accept:"application/vnd.github+json"}});if(!response.ok)throw new Error(`GitHub returned ${response.status}`);const data=await response.json();state.files=data.tree.filter(include);render()}catch(error){console.error(error);status.innerHTML=`Could not load the repository index right now. <a href="https://github.com/${repo.owner}/${repo.name}">Browse files on GitHub</a>.`}}
+    filters.forEach(button=>button.addEventListener("click",()=>{state.filter=button.dataset.filter;filters.forEach(x=>x.setAttribute("aria-pressed",String(x===button)));render()}));
+    search.addEventListener("input",event=>{state.query=event.currentTarget.value;render()});
+    load();
+  </script>
+
+
+</body></html>
