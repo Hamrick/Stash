@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="A small public stash for images, videos, and simple webpages.">
+  <title>Stash</title>
+  <style>
+    :root { color-scheme: dark; font-family: ui-sans-serif, system-ui, sans-serif; }
+    * { box-sizing: border-box; }
+    body { margin: 0; min-height: 100vh; display: grid; place-items: center; background: #0b0d10; color: #f5f7fa; }
+    main { width: min(900px, 92vw); padding: 4rem 0; }
+    h1 { margin: 0 0 .5rem; font-size: clamp(2.5rem, 8vw, 5rem); letter-spacing: -.06em; }
+    p { color: #aeb7c4; line-height: 1.6; }
+    .card { margin-top: 2rem; padding: 1rem; border: 1px solid #29313d; border-radius: 1rem; background: #12161c; }
+    video { display: block; width: 100%; max-height: 60vh; border-radius: .65rem; background: #090b0e; }
+    a { color: #8cc8ff; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Stash</h1>
+    <p>A public home for images, videos, and small static webpages.</p>
+    <section class="card">
+      <video autoplay loop muted playsinline controls>
+        <source src="LimitlessHeroVidNoBG.webm" type="video/webm">
+        Your browser does not support WebM video.
+      </video>
+      <p><a href="LimitlessHeroVidNoBG.webm">Open the video directly</a></p>
+    </section>
+  </main>
+</body>
+</html>
